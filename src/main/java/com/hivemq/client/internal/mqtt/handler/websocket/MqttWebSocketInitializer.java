@@ -88,7 +88,7 @@ public class MqttWebSocketInitializer extends ChannelInboundHandlerAdapter {
 
     @Override
     public void channelActive(final ChannelHandlerContext ctx) {
-        assert handshaker != null;
+        assert handshaker != null : "initChannel must be called before";
 
         ctx.fireChannelActive();
         handshaker.handshake(ctx.channel(), ctx.voidPromise());
@@ -96,7 +96,7 @@ public class MqttWebSocketInitializer extends ChannelInboundHandlerAdapter {
 
     @Override
     public void channelRead(final @NotNull ChannelHandlerContext ctx, final @NotNull Object msg) {
-        assert handshaker != null;
+        assert handshaker != null : "initChannel must be called before";
 
         if (msg instanceof FullHttpResponse) {
             final FullHttpResponse response = (FullHttpResponse) msg;
