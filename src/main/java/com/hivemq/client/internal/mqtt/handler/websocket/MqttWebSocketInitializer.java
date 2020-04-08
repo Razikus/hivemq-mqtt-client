@@ -22,6 +22,7 @@ import com.hivemq.client.internal.mqtt.MqttWebSocketConfigImpl;
 import com.hivemq.client.internal.mqtt.datatypes.MqttVariableByteInteger;
 import com.hivemq.client.internal.mqtt.handler.MqttChannelInitializer;
 import com.hivemq.client.internal.mqtt.ioc.ConnectionScope;
+import com.hivemq.client.internal.util.Checks;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
@@ -101,10 +102,9 @@ public class MqttWebSocketInitializer extends ChannelInboundHandlerAdapter {
         if (msg instanceof FullHttpResponse) {
             final FullHttpResponse response = (FullHttpResponse) msg;
             try {
-                if (handshaker.isHandshakeComplete()) {
-                    throw new IllegalStateException(
-                            "Must not receive http response if websocket handshake is already finished.");
-                }
+                Checks.state(
+                        !handshaker.isHandshakeComplete(),
+                        "Must not receive http response if websocket handshake is already finished.");
                 handshaker.finishHandshake(ctx.channel(), response);
                 mqttChannelInitializer.initMqtt(ctx.channel());
                 ctx.pipeline().remove(this);
